@@ -1,52 +1,53 @@
 
     require([
-    "esri/map",
+    
     "esri/InfoTemplate",
     "esri/domUtils", 
-    "esri/layers/FeatureLayer",
+    
     "esri/symbols/SimpleMarkerSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/symbols/PictureMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
     "esri/Color",
-    "esri/graphicsUtils",
     "esri/renderers/UniqueValueRenderer",
-    "esri/dijit/Legend",
-    "esri/dijit/PopupTemplate",
+
     "esri/dijit/FeatureTable",
     "esri/dijit/Search",
     "esri/dijit/LayerList",
-    "esri/tasks/query",
-    "dijit/layout/BorderContainer", 
-    "dijit/layout/ContentPane",
-    "dijit/form/ComboBox",
+   
+     
+    
+    
     "dijit/registry", 
-    'dojo/dnd/Moveable',
+    
+    
+     
     "dojo/dom",
     "dojo/parser",
     "dojo/ready",
-    "dojo/on",
-    "dojo/domReady!",
-    "dojox/grid/EnhancedGrid",
-    "dojo/data/ItemFileWriteStore",
-    "dojox/grid/enhanced/plugins/exporter/CSVWriter",
-    "dojox/grid/enhanced/plugins/Printer",
-    "esri/dijit/Print", 
-    "esri/tasks/PrintTemplate",    
-    "esri/request", 
-    "esri/config",
-    "dojo/_base/array",
-    "dojo/dom-construct",  
-    "esri/arcgis/utils", 
-    "esri/dijit/Popup" 
-
-  ], function(Map, InfoTemplate, domUtils, FeatureLayer, SimpleMarkerSymbol, SimpleLineSymbol, 
-  PictureMarkerSymbol, SimpleFillSymbol, Color, graphicsUtils, UniqueValueRenderer, Legend,
-   PopupTemplate, FeatureTable, Search, LayerList, Query, BorderContainer, ContentPane, ComboBox, 
-   registry, Moveable, dom, parser, ready, on, EnhancedGrid, ItemFileWriteStore, CSVWriter, Printer, 
-   Print, PrintTemplate, esriRequest, esriConfig, arrayUtils, domConstruct, arcgisUtils,  Popup
+    
+    
+    "esri/map",    
+    "dojo/on",    
+    "esri/tasks/query",    
+    "esri/layers/FeatureLayer",    
+    "dojo/store/Memory",    
+    "dojo/_base/array",    
+    "dojo/_base/lang",    
+    "esri/request",    
+    "dojo/json",    
+    "dijit/layout/BorderContainer",    
+    "dijit/layout/ContentPane",    
+    "dijit/form/Button",    
+    "dijit/form/ComboBox",    
+    "dojo/domReady!"
+    
+    
+  ], function(InfoTemplate, domUtils, SimpleMarkerSymbol, SimpleLineSymbol, 
+  PictureMarkerSymbol, SimpleFillSymbol, Color,  UniqueValueRenderer, 
+    FeatureTable, Search, LayerList, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, json
 ) {
-        ready(function () {
+       
 
           parser.parse();
 
@@ -218,14 +219,11 @@
           });
 
           var JobStatusLyr = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {
-            mode: FeatureLayer.MODE_ONDEMAND,
+            
             outFields: ["*"],
             infoTemplate: infoTemplatecustom
           });
-          var getList = new esri.layers.FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {
-              mode: esri.layers.FeatureLayer.MODE_SELECTION,
-              outFields: ["*"]
-            });
+          
 
            JobStatusLyr.on("click", function(evt) {
             var idProperty = JobStatusLyr.objectIdField,
@@ -250,6 +248,148 @@
           JobStatusLyr.setRenderer(renderer);
           map.addLayer(JobStatusLyr);
 
+          var zipcodes = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {    
+        mode: FeatureLayer.MODE_SELECTION,    
+        outFields: ["*"]    
+      });    
+  
+      map.addLayers([zipcodes]);    
+      map.on("layers-add-result", lang.hitch(this, function(){    
+        var url = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0/generateRenderer";    
+        var classificationDef = {"type":"uniqueValueDef","uniqueValueFields":["Map_Status"]};  
+        var classificationDef2 = {"type":"uniqueValueDef","uniqueValueFields":["Route_No"]};  
+        var classificationDef3 = {"type":"uniqueValueDef","uniqueValueFields":["County_Name"]};  
+        var str = json.stringify(classificationDef);  
+        var str2 = json.stringify(classificationDef2);  
+        var str3 = json.stringify(classificationDef3); 
+
+        ////////////////////////////////////////////////////////////
+
+        esriRequest({    
+          url:url,    
+          content:{    
+            classificationDef:str,    
+            f:'json'    
+          },    
+          handleAs:'json',    
+          callbackParamName:'callback',    
+          timeout:15000    
+        }).then(lang.hitch(this,function(response){    
+          var uniqueValueInfos = response && response.uniqueValueInfos;    
+          if(uniqueValueInfos){    
+            var store2 = new Memory({data:[]});    
+            dijit.byId("uniqueValuesSelect").set('store',store2);    
+            var data = array.map(uniqueValueInfos,lang.hitch(this,function(info,index){    
+              var value = info.value;    
+              //value = parseFloat(value);    
+              var dataItem = {    
+                id:index,    
+                name:value    
+              };    
+              return dataItem;    
+            }));    
+            store2 = new Memory({data:data});    
+            dijit.byId("uniqueValuesSelect").set('store',store2);    
+          }    
+        }),lang.hitch(this,function(error){    
+          console.error(error);    
+        }));  
+
+        ////////////////////////////////////////////////////////////
+
+        esriRequest({    
+          url:url,    
+          content:{    
+            classificationDef:str2,    
+            f:'json'    
+          },    
+          handleAs:'json',    
+          callbackParamName:'callback',    
+          timeout:15000    
+        }).then(lang.hitch(this,function(response){    
+          var uniqueValueInfos2 = response && response.uniqueValueInfos;    
+          if(uniqueValueInfos2){    
+            var store3 = new Memory({data:[]});    
+            dijit.byId("uniqueValuesSelect2").set('store',store3);    
+            var data2 = array.map(uniqueValueInfos2,lang.hitch(this,function(info,index){    
+              var value2 = info.value;    
+              //value2 = parseFloat(value2);    
+              var dataItem2 = {    
+                id:index,    
+                name:value2    
+              };    
+              return dataItem2;    
+            }));    
+            store3 = new Memory({data:data2});    
+            dijit.byId("uniqueValuesSelect2").set('store',store3);    
+          }    
+        }),lang.hitch(this,function(error){    
+          console.error(error);    
+        }));  
+
+        ////////////////////////////////////////////////////////////
+
+        esriRequest({    
+          url:url,    
+          content:{    
+            classificationDef:str3,    
+            f:'json'    
+          },    
+          handleAs:'json',    
+          callbackParamName:'callback',    
+          timeout:15000    
+        }).then(lang.hitch(this,function(response){    
+          var uniqueValueInfos3 = response && response.uniqueValueInfos;    
+          if(uniqueValueInfos3){    
+            var store4 = new Memory({data:[]});    
+            dijit.byId("uniqueValuesSelect3").set('store',store4);    
+            var data2 = array.map(uniqueValueInfos3,lang.hitch(this,function(info,index){    
+              var value2 = info.value;    
+              //value2 = parseFloat(value2);    
+              var dataItem2 = {    
+                id:index,    
+                name:value2    
+              };    
+              return dataItem2;    
+            }));    
+            store4 = new Memory({data:data2});    
+            dijit.byId("uniqueValuesSelect3").set('store',store4);    
+          }    
+        }),lang.hitch(this,function(error){    
+          console.error(error);    
+        }));  
+
+        ////////////////////////////////////////////////////////////
+
+
+      }));    
+  
+      app = {    
+        zoomRow: function(id, which){     
+          JobStatusLyr.clearSelection();    
+          var query = new Query();  
+          if(which == "zip"){  
+            query.where = "Map_Status='" + (id).toString() + "'";   
+          }if(which == "geo"){  
+            query.where = "Route_No='" + (id).toString() + "'";   
+          }if(which == "CountyName"){  
+            query.where = "County_Name='" + (id).toString() + "'";   
+          }   
+          console.info(query.where);  
+          query.returnGeometry = true;    
+          JobStatusLyr.selectFeatures(query, FeatureLayer.SELECTION_NEW, function (features) {    
+            //var thePoly = features[0].geometry;    
+            //var theExtent = thePoly.getExtent().expand(2); //Zoom out slightly from the polygon's extent     
+            //map.setExtent(theExtent);   
+          
+          });  
+          JobStatusLyr.setDefinitionExpression(query.where);   
+        }    
+      };
+
+  
+      
+          
           var bridgesUrl = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Bridge/FeatureServer/0";
 
           BridgesLyr = new FeatureLayer(bridgesUrl, {
@@ -398,7 +538,7 @@
             routeType = document.getElementById("routeFilter").value;
 
             if(statusType !== "") {
-              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "Map_Status = '" + statusType + "'"
+              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "Map_Status = '" + uniqueValuesSelect + "'"
             }
             if(countyType !== "") {
               definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "County_Name = '" + countyType + "'"
@@ -469,10 +609,13 @@
           function selectNext() {
             map.infoWindow.selectNext();
           }
-        });
 
-      
+            
+          
 
 
+          
+     
 
+        
       });

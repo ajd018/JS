@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <title>Job Status Polygon Map</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/3.20/dijit/themes/claro/claro.css" />
+  <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/css/esri.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans">
+
+  <link rel="stylesheet" type="text/css" href="JSstylesheet.css">
+  
+  <script src="https://js.arcgis.com/3.20/"></script>
+
+  <script src="comboboxTEST.js"></script> 
+ 
+
+</head>
+
+<body class="claro">
+  
+    <div id="content"
+     data-dojo-type="dijit/layout/BorderContainer"
+     data-dojo-props="design:'headline', gutters:true"
+     style="width: 100%; height: 100%; margin: 0;">
+
+
+     
+ <div id="rightPane"
+       data-dojo-type="dijit/layout/ContentPane"
+       data-dojo-props="region:'right'">
+
+    <div data-dojo-type="dijit/layout/AccordionContainer">
+      
+      <div data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="title:'Attribute Filter', selected:true">
+          <input id="uniqueValuesSelect" data-dojo-type="dijit.form.ComboBox" value="Status" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect').value, 'zip');" />  
+          <input id="uniqueValuesSelect2" data-dojo-type="dijit.form.ComboBox" value="RouteNumber" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect2').value, 'geo');" /> 
+          <input id="uniqueValuesSelect3" data-dojo-type="dijit.form.ComboBox" value="County" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect3').value, 'CountyName');" /> 
+          
+            <span id="Filter" >
+
+              <p>Sort by:</p>
+
+            <p>Status: 
+              <select id='statusFilter'>
+
+              <option value=''''>ALL</option>
+              <option value='00'>00</option>
+              <option value='01'>01</option>
+              <option value='02'>02</option>
+              <option value='03'>03</option>
+
+            </select><br></p>
+
+            <p>County: 
+            <select id='countyFilter'>
+              <option value=''''>ALL</option>
+              <option value='Pulaski'>Pulaski</option>
+              <option value='Saline'>Saline</option>
+            </select>
+
+            <p>District: 
+            <select id='districtFilter'>
+              <option value=''''>ALL</option>
+              <option value='1'>1</option>
+              <option value='6'>6</option>
+              <option value='10'>10</option>
+              <option value='11'>11</option>
+            </select>
+
+            <p>Route: 
+            <select id='routeFilter'>
+             
+            </select>
+
+
+
+
+            <p style="margin-top:-7px; font-size:12px">
+              <a href="javascript:{}" id="applyFilter">Apply filter</a>
+            </span>
+
+            <br>
+
+            
+   
+      </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="title:'layerList'">
+        <div id="layerList"></div>
+      </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane" id="legendPane"
+           data-dojo-props="title:'Legend'">
+        
+        <img src="Legend.jpg" width="300" >
+      </div>
+      <div data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="title:'Search'">
+        <div id="search"></div>
+      </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="title:'FeatureDisplay'">
+        <div>
+   
+         <div id="leftPaneright" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
+
+            <div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">
+              <div id="featureCount" style="margin-bottom:5px;">Click to select feature</div>
+              <div id="pager" style="display:none;">
+                <a href='javascript:void(0);' id="previous" class='nav' style="text-decoration: none;">
+                  &lt; Prev
+                </a> &nbsp;
+                <a href='javascript:void(0);' id="next" class='nav' style="text-decoration: none;">
+                  Next &gt;
+                </a>
+              </div>
+            </div>
+          </div>
+
+
+
+
+      
+      </div>
+     </div>
+    </div>
+
+<div id="map"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region:'center'"
+         style="overflow:hidden;">
+    </div>
+<div id="bot" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true" style="height:30%;">
+      <div id="myTableNode"></div>
+    </div>
+    
+  </div>
+
+
+
+</body>
+
+</html>
