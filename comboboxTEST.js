@@ -58,12 +58,6 @@
             zoom: 12
           });
 
-          
-          map.on("load", loadTable);
-
-          function loadTable(){
-
-
           map.infoWindow.set("popupWindow", false);
 
           var infoTemplatecustom = new InfoTemplate();
@@ -74,6 +68,19 @@
             "<tr><td>Map_Status</td><td>${Map_Status}</td></tr>" +
             "</table><hr>");
 
+
+          var JobStatusLyr = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {
+            
+            outFields: ["*"],
+            infoTemplate: infoTemplatecustom
+          });
+          
+          map.on("load", loadTable);
+
+          function loadTable(){
+
+
+          
         
 
           var defaultSym = new SimpleMarkerSymbol().setOutline(new SimpleLineSymbol().setWidth(3).setColor(new Color([128,128,128])));
@@ -214,11 +221,7 @@
             symbol: bluefill
           });
 
-          var JobStatusLyr = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {
-            
-            outFields: ["*"],
-            infoTemplate: infoTemplatecustom
-          });
+          
           
 
            JobStatusLyr.on("click", function(evt) {
@@ -244,7 +247,7 @@
           JobStatusLyr.setRenderer(renderer);
           map.addLayer(JobStatusLyr);
 
-         
+          
          
       
       map.on("layer-add-result", lang.hitch(this, function(){    
@@ -586,7 +589,44 @@
 
             
           
-         
+          var selectionToolbar;
+
+          map.on("load", initSelectToolbar);
+  
+          var fieldsSelectionSymbol =
+            new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+            new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
+
+          var selectline = new SimpleLineSymbol();
+          selectline.setWidth(4);
+          selectline.setColor(new Color([0,255,255, 1]));
+          var selectlineSymbol = new SimpleFillSymbol();
+          selectlineSymbol.setOutline(selectline);
+          selectlineSymbol.setColor(new Color([46,191,240, 0]));
+  
+          
+          JobStatusLyr.setSelectionSymbol(selectlineSymbol);
+  
+          on(dom.byId("selectFieldsButton"), "click", function () {
+            selectionToolbar.activate(Draw.EXTENT);
+          });
+  
+          on(dom.byId("clearSelectionButton"), "click", function () {
+            JobStatusLyr.clearSelection();
+          });
+  
+          function initSelectToolbar (event) {
+            selectionToolbar = new Draw(event.map);
+            var selectQuery = new Query();
+  
+            on(selectionToolbar, "DrawEnd", function (geometry) {
+              selectionToolbar.deactivate();
+              selectQuery.geometry = geometry;
+              JobStatusLyr.selectFeatures(selectQuery,
+                FeatureLayer.SELECTION_NEW);
+            });
+          }
 
           
      
