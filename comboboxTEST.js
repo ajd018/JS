@@ -13,6 +13,7 @@
     "esri/dijit/FeatureTable",
     "esri/dijit/Search",
     "esri/dijit/LayerList",
+    "esri/dijit/Print",
     
     "dijit/registry", 
     "dojo/dom",
@@ -39,7 +40,7 @@
     
   ], function(InfoTemplate, domUtils, SimpleMarkerSymbol, SimpleLineSymbol, 
   PictureMarkerSymbol, SimpleFillSymbol, Color,  UniqueValueRenderer, 
-    FeatureTable, Search, LayerList, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
+    FeatureTable, Search, LayerList, Print, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
 ) {
        
 
@@ -57,6 +58,14 @@
             center: [-92.289597, 34.746483],
             zoom: 12
           });
+
+          var printer = new Print({
+            map: map,
+            url: "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          }, dom.byId("printButton"));
+         printer.startup();
+
+          
 
           map.infoWindow.set("popupWindow", false);
 
@@ -589,6 +598,7 @@
 
             
           
+
           var selectionToolbar;
 
           map.on("load", initSelectToolbar);
