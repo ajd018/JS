@@ -7,13 +7,12 @@
     "esri/symbols/SimpleLineSymbol",
     "esri/symbols/PictureMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
-    
     "esri/Color",
     "esri/renderers/UniqueValueRenderer",
     "esri/dijit/FeatureTable",
     "esri/dijit/Search",
     "esri/dijit/LayerList",
-    
+    "esri/dijit/Print",
     "dijit/registry", 
     "dojo/dom",
     "dojo/parser",
@@ -31,7 +30,8 @@
     "dijit/layout/BorderContainer",    
     "dijit/layout/ContentPane",    
     "dijit/form/Button",    
-    "dijit/form/ComboBox",    
+    "dijit/form/ComboBox", 
+    "dijit/form/FilteringSelect",   
     "dojo/domReady!"
 
     
@@ -39,7 +39,7 @@
     
   ], function(InfoTemplate, domUtils, SimpleMarkerSymbol, SimpleLineSymbol, 
   PictureMarkerSymbol, SimpleFillSymbol, Color,  UniqueValueRenderer, 
-    FeatureTable, Search, LayerList, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
+    FeatureTable, Search, LayerList, Print, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
 ) {
        
 
@@ -309,7 +309,7 @@
             dijit.byId("routeSelect").set('store',store3);    
             var data2 = array.map(uniqueValueInfos2,lang.hitch(this,function(info,index){    
               var value2 = info.value;    
-              //value2 = parseFloat(value2);    
+              value2 = parseFloat(value2);    
               var dataItem2 = {    
                 id:index,    
                 name:value2    
@@ -360,8 +360,8 @@
 
       }));    
   
-      app = {    
-        zoomRow: function(elem){     
+      selectorApp = {    
+        valueselect: function(elem){     
           JobStatusLyr.clearSelection();    
           var query = new Query();
           var where = "";
@@ -395,7 +395,7 @@
         }    
       };
 
-  
+ 
       
           
           var bridgesUrl = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Bridge/FeatureServer/0";
@@ -589,6 +589,7 @@
 
             
           
+
           var selectionToolbar;
 
           map.on("load", initSelectToolbar);
@@ -628,7 +629,7 @@
             });
           }
 
-          
+       
      
 
         

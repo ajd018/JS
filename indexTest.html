@@ -8,29 +8,22 @@
   <link rel="stylesheet" href="https://js.arcgis.com/3.20/dijit/themes/claro/claro.css" />
   <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/css/esri.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans">
-
   <link rel="stylesheet" type="text/css" href="JSstylesheet.css">
-  
   <script src="https://js.arcgis.com/3.20/"></script>
 
   <script src="comboboxTEST.js"></script> 
- 
+  
 
 </head>
 
 <body class="claro">
   <button id="selectFieldsButton" data-dojo-type="dijit/form/Button">Select Fields</button>
-            <button id="clearSelectionButton" data-dojo-type="dijit/form/Button">Clear Selection</button><br>
-            <span id="messages"></span>
-
-
+  <button id="clearSelectionButton" data-dojo-type="dijit/form/Button">Clear Selection</button> 
     <div id="content"
      data-dojo-type="dijit/layout/BorderContainer"
      data-dojo-props="design:'headline', gutters:true"
      style="width: 100%; height: 100%; margin: 0;">
-
-
-     
+ 
  <div id="rightPane"
        data-dojo-type="dijit/layout/ContentPane"
        data-dojo-props="region:'right'">
@@ -39,22 +32,16 @@
       
       <div data-dojo-type="dijit/layout/ContentPane"
            data-dojo-props="title:'Attribute Filter', selected:true">
-          <input id="statusSelect" data-dojo-type="dijit.form.ComboBox" value="Status" onchange="app.zoomRow(document.getElementById('statusSelect').value);" />  
-          <input id="routeSelect" data-dojo-type="dijit.form.ComboBox" value="Route No" onchange="app.zoomRow(document.getElementById('routeSelect').value);" /> 
-          <input id="countySelect" data-dojo-type="dijit.form.ComboBox" value="County Name" onchange="app.zoomRow(document.getElementById('countySelect').value);" /> 
-          
-           
+          <input id="statusSelect" data-dojo-type="dijit.form.ComboBox"  value="Status" onchange="selectorApp.valueselect(document.getElementById('statusSelect').value);" />  
+          <input id="routeSelect" data-dojo-type="dijit.form.ComboBox" value="Route No" onchange="selectorApp.valueselect(document.getElementById('routeSelect').value);" /> 
+          <input id="countySelect" data-dojo-type="dijit.form.ComboBox" value="County Name" onchange="selectorApp.valueselect(document.getElementById('countySelect').value);" /> 
 
-           
-
-            
-            
-   
       </div>
 
       <div data-dojo-type="dijit/layout/ContentPane"
            data-dojo-props="title:'layerList'">
         <div id="layerList"></div>
+        
       </div>
 
       <div data-dojo-type="dijit/layout/ContentPane" id="legendPane"
@@ -85,11 +72,6 @@
               </div>
             </div>
           </div>
-
-
-
-
-      
       </div>
      </div>
     </div>
@@ -100,6 +82,7 @@
          style="overflow:hidden;">
     </div>
 <div id="bot" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true" style="height:30%;">
+        
         <div id="myTableNode"></div>
     </div>
     
