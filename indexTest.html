@@ -19,7 +19,11 @@
 </head>
 
 <body class="claro">
-  
+  <button id="selectFieldsButton" data-dojo-type="dijit/form/Button">Select Fields</button>
+            <button id="clearSelectionButton" data-dojo-type="dijit/form/Button">Clear Selection</button><br>
+            <span id="messages"></span>
+
+
     <div id="content"
      data-dojo-type="dijit/layout/BorderContainer"
      data-dojo-props="design:'headline', gutters:true"
@@ -35,55 +39,15 @@
       
       <div data-dojo-type="dijit/layout/ContentPane"
            data-dojo-props="title:'Attribute Filter', selected:true">
-          <input id="uniqueValuesSelect" data-dojo-type="dijit.form.ComboBox" value="Status" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect').value, 'zip');" />  
-          <input id="uniqueValuesSelect2" data-dojo-type="dijit.form.ComboBox" value="RouteNumber" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect2').value, 'geo');" /> 
-          <input id="uniqueValuesSelect3" data-dojo-type="dijit.form.ComboBox" value="County" onchange="app.zoomRow(document.getElementById('uniqueValuesSelect3').value, 'CountyName');" /> 
+          <input id="statusSelect" data-dojo-type="dijit.form.ComboBox" value="Status" onchange="app.zoomRow(document.getElementById('statusSelect').value);" />  
+          <input id="routeSelect" data-dojo-type="dijit.form.ComboBox" value="Route No" onchange="app.zoomRow(document.getElementById('routeSelect').value);" /> 
+          <input id="countySelect" data-dojo-type="dijit.form.ComboBox" value="County Name" onchange="app.zoomRow(document.getElementById('countySelect').value);" /> 
           
-            <span id="Filter" >
+           
 
-              <p>Sort by:</p>
+           
 
-            <p>Status: 
-              <select id='statusFilter'>
-
-              <option value=''''>ALL</option>
-              <option value='00'>00</option>
-              <option value='01'>01</option>
-              <option value='02'>02</option>
-              <option value='03'>03</option>
-
-            </select><br></p>
-
-            <p>County: 
-            <select id='countyFilter'>
-              <option value=''''>ALL</option>
-              <option value='Pulaski'>Pulaski</option>
-              <option value='Saline'>Saline</option>
-            </select>
-
-            <p>District: 
-            <select id='districtFilter'>
-              <option value=''''>ALL</option>
-              <option value='1'>1</option>
-              <option value='6'>6</option>
-              <option value='10'>10</option>
-              <option value='11'>11</option>
-            </select>
-
-            <p>Route: 
-            <select id='routeFilter'>
-             
-            </select>
-
-
-
-
-            <p style="margin-top:-7px; font-size:12px">
-              <a href="javascript:{}" id="applyFilter">Apply filter</a>
-            </span>
-
-            <br>
-
+            
             
    
       </div>

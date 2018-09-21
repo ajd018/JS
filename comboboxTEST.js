@@ -1,32 +1,23 @@
 
     require([
-    
+      
     "esri/InfoTemplate",
-    "esri/domUtils", 
-    
+    "esri/domUtils",
     "esri/symbols/SimpleMarkerSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/symbols/PictureMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
+    
     "esri/Color",
     "esri/renderers/UniqueValueRenderer",
-
     "esri/dijit/FeatureTable",
     "esri/dijit/Search",
     "esri/dijit/LayerList",
-   
-     
-    
     
     "dijit/registry", 
-    
-    
-     
     "dojo/dom",
     "dojo/parser",
     "dojo/ready",
-    
-    
     "esri/map",    
     "dojo/on",    
     "esri/tasks/query",    
@@ -34,26 +25,30 @@
     "dojo/store/Memory",    
     "dojo/_base/array",    
     "dojo/_base/lang",    
-    "esri/request",    
+    "esri/request",
+    "esri/toolbars/draw",    
     "dojo/json",    
     "dijit/layout/BorderContainer",    
     "dijit/layout/ContentPane",    
     "dijit/form/Button",    
     "dijit/form/ComboBox",    
     "dojo/domReady!"
+
+    
     
     
   ], function(InfoTemplate, domUtils, SimpleMarkerSymbol, SimpleLineSymbol, 
   PictureMarkerSymbol, SimpleFillSymbol, Color,  UniqueValueRenderer, 
-    FeatureTable, Search, LayerList, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, json
+    FeatureTable, Search, LayerList, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
 ) {
        
 
           parser.parse();
-
+          
           //setup event handlers for the next/previous buttons
           on(dom.byId("previous"), "click", selectPrevious);
           on(dom.byId("next"), "click", selectNext);
+          
 
           var map;
 
@@ -63,6 +58,7 @@
             zoom: 12
           });
 
+          
           map.on("load", loadTable);
 
           function loadTable(){
@@ -248,13 +244,10 @@
           JobStatusLyr.setRenderer(renderer);
           map.addLayer(JobStatusLyr);
 
-          var zipcodes = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {    
-        mode: FeatureLayer.MODE_SELECTION,    
-        outFields: ["*"]    
-      });    
-  
-      map.addLayers([zipcodes]);    
-      map.on("layers-add-result", lang.hitch(this, function(){    
+         
+         
+      
+      map.on("layer-add-result", lang.hitch(this, function(){    
         var url = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0/generateRenderer";    
         var classificationDef = {"type":"uniqueValueDef","uniqueValueFields":["Map_Status"]};  
         var classificationDef2 = {"type":"uniqueValueDef","uniqueValueFields":["Route_No"]};  
@@ -278,7 +271,7 @@
           var uniqueValueInfos = response && response.uniqueValueInfos;    
           if(uniqueValueInfos){    
             var store2 = new Memory({data:[]});    
-            dijit.byId("uniqueValuesSelect").set('store',store2);    
+            dijit.byId("statusSelect").set('store',store2);    
             var data = array.map(uniqueValueInfos,lang.hitch(this,function(info,index){    
               var value = info.value;    
               //value = parseFloat(value);    
@@ -289,7 +282,7 @@
               return dataItem;    
             }));    
             store2 = new Memory({data:data});    
-            dijit.byId("uniqueValuesSelect").set('store',store2);    
+            dijit.byId("statusSelect").set('store',store2);    
           }    
         }),lang.hitch(this,function(error){    
           console.error(error);    
@@ -310,7 +303,7 @@
           var uniqueValueInfos2 = response && response.uniqueValueInfos;    
           if(uniqueValueInfos2){    
             var store3 = new Memory({data:[]});    
-            dijit.byId("uniqueValuesSelect2").set('store',store3);    
+            dijit.byId("routeSelect").set('store',store3);    
             var data2 = array.map(uniqueValueInfos2,lang.hitch(this,function(info,index){    
               var value2 = info.value;    
               //value2 = parseFloat(value2);    
@@ -321,7 +314,7 @@
               return dataItem2;    
             }));    
             store3 = new Memory({data:data2});    
-            dijit.byId("uniqueValuesSelect2").set('store',store3);    
+            dijit.byId("routeSelect").set('store',store3);    
           }    
         }),lang.hitch(this,function(error){    
           console.error(error);    
@@ -342,7 +335,7 @@
           var uniqueValueInfos3 = response && response.uniqueValueInfos;    
           if(uniqueValueInfos3){    
             var store4 = new Memory({data:[]});    
-            dijit.byId("uniqueValuesSelect3").set('store',store4);    
+            dijit.byId("countySelect").set('store',store4);    
             var data2 = array.map(uniqueValueInfos3,lang.hitch(this,function(info,index){    
               var value2 = info.value;    
               //value2 = parseFloat(value2);    
@@ -353,7 +346,7 @@
               return dataItem2;    
             }));    
             store4 = new Memory({data:data2});    
-            dijit.byId("uniqueValuesSelect3").set('store',store4);    
+            dijit.byId("countySelect").set('store',store4);    
           }    
         }),lang.hitch(this,function(error){    
           console.error(error);    
@@ -365,16 +358,28 @@
       }));    
   
       app = {    
-        zoomRow: function(id, which){     
+        zoomRow: function(elem){     
           JobStatusLyr.clearSelection();    
-          var query = new Query();  
-          if(which == "zip"){  
-            query.where = "Map_Status='" + (id).toString() + "'";   
-          }if(which == "geo"){  
-            query.where = "Route_No='" + (id).toString() + "'";   
-          }if(which == "CountyName"){  
-            query.where = "County_Name='" + (id).toString() + "'";   
-          }   
+          var query = new Query();
+          var where = "";
+          var tempElem;
+
+          tempElem = document.getElementById("statusSelect");
+          if(tempElem.value != "Status") {
+            where += (where !== "" ? " AND " : "") + "Map_Status='" + tempElem.value.toString() + "'";
+          }
+          
+          tempElem = document.getElementById("routeSelect");
+          if(tempElem.value != "Route No") {
+            where += (where !== "" ? " AND " : "") + "Route_No='" + tempElem.value.toString() + "'"; 
+          }
+
+          tempElem = document.getElementById("countySelect");
+          if(tempElem.value != "County Name") {
+            where += (where !== "" ? " AND " : "") + "County_Name='" + tempElem.value.toString() + "'"; 
+          }
+          query.where = where;
+
           console.info(query.where);  
           query.returnGeometry = true;    
           JobStatusLyr.selectFeatures(query, FeatureLayer.SELECTION_NEW, function (features) {    
@@ -527,37 +532,6 @@
 
 
             search.startup();
-
-          
-          function getFilterText(){
-            var definitionExpression = ""
-
-            statusType = document.getElementById("statusFilter").value;
-            countyType = document.getElementById("countyFilter").value;
-            districtType = document.getElementById("districtFilter").value;
-            routeType = document.getElementById("routeFilter").value;
-
-            if(statusType !== "") {
-              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "Map_Status = '" + uniqueValuesSelect + "'"
-            }
-            if(countyType !== "") {
-              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "County_Name = '" + countyType + "'"
-            }
-            if(districtType !== "") {
-              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "District_No = '" + districtType + "'"
-            }
-            if(routeType !== "") {
-              definitionExpression = definitionExpression + (definitionExpression == "" ? "" : " AND ") + "Route_No = '" + routeType + "'"
-            }
-
-            return definitionExpression
-          }
-
-
-
-          document.getElementById('applyFilter').onclick = function countyFilter() {
-            JobStatusLyr.setDefinitionExpression(getFilterText());
-              }
             }
 
           ('load', initializeSidebar());
@@ -612,7 +586,7 @@
 
             
           
-
+         
 
           
      
