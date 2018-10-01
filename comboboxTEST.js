@@ -58,6 +58,14 @@
             zoom: 12
           });
 
+          var printer = new Print({
+            map: map,
+            url: "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          }, dom.byId("printButton"));
+         printer.startup();
+
+          
+
           map.infoWindow.set("popupWindow", false);
 
           var infoTemplatecustom = new InfoTemplate();
