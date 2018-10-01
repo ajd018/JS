@@ -31,10 +31,20 @@
     <div data-dojo-type="dijit/layout/AccordionContainer">
       
       <div data-dojo-type="dijit/layout/ContentPane"
-           data-dojo-props="title:'Attribute Filter', selected:true">
+           data-dojo-props="title:'Attribute Filter JobStatus', selected:true">
           <input id="statusSelect" data-dojo-type="dijit.form.ComboBox"  value="Status" onchange="selectorApp.valueselect(document.getElementById('statusSelect').value);" />  
           <input id="routeSelect" data-dojo-type="dijit.form.ComboBox" value="Route No" onchange="selectorApp.valueselect(document.getElementById('routeSelect').value);" /> 
           <input id="countySelect" data-dojo-type="dijit.form.ComboBox" value="County Name" onchange="selectorApp.valueselect(document.getElementById('countySelect').value);" /> 
+
+          
+
+      </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="title:'Attribute Filter Bridges', selected:true">
+           
+           <input id="BridgeNoSelect" data-dojo-type="dijit.form.ComboBox"  value="BridgeNo" onchange="selectorAppBridge.valueselectBridge(document.getElementById('BridgeNoSelect').value);" />  
+
 
       </div>
 
@@ -82,8 +92,8 @@
          style="overflow:hidden;">
     </div>
 <div id="bot" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true" style="height:30%;">
-        
-        <div id="myTableNode"></div>
+        <!--This is a comment.Comments are not displayed in the browser-->
+        <div id="myTableNode"></div> 
     </div>
     
   </div>

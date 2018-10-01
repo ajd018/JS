@@ -58,11 +58,7 @@
             zoom: 12
           });
 
-          var printer = new Print({
-            map: map,
-            url: "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
-          }, dom.byId("printButton"));
-         printer.startup();
+   
 
           
 
@@ -76,6 +72,13 @@
             "<tr><td>Map_Status</td><td>${Map_Status}</td></tr>" +
             "</table><hr>");
 
+            var infoTemplatecustomBridge = new InfoTemplate();
+            infoTemplatecustomBridge.setTitle("WMA - ");
+            infoTemplatecustomBridge.setContent("<table>" +
+              "<tr><td>Struct_Num</td><td>${Struct_Num}</td></tr>" +
+              "<tr><td>RouteNumber</td><td>${RouteNumber}</td></tr>" +
+              "<tr><td>Location</td><td>${Location}</td></tr>" +
+              "</table><hr>");
 
           var JobStatusLyr = new FeatureLayer("http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0", {
             
@@ -255,7 +258,15 @@
           JobStatusLyr.setRenderer(renderer);
           map.addLayer(JobStatusLyr);
 
-          
+          var bridgesUrl = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Bridge/FeatureServer/0";
+
+          BridgesLyr = new FeatureLayer(bridgesUrl, {
+            outFields: ["*"],
+            mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
+            visible: false,  
+            infoTemplate: infoTemplatecustomBridge
+          });
+          map.addLayer(BridgesLyr);
          
       
       map.on("layer-add-result", lang.hitch(this, function(){    
@@ -267,6 +278,40 @@
         var str2 = json.stringify(classificationDef2);  
         var str3 = json.stringify(classificationDef3); 
 
+        var bridgeurl = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/JSpolygontest/FeatureServer/0/generateRenderer";  
+        var classificationDefBridge = {"type":"uniqueValueDef","uniqueValueFields":["Struct_Num"]};  
+        var strBridge = json.stringify(classificationDefBridge);
+        ////////////////////////////////////////////////////////////
+
+        esriRequest({    
+          url:bridgeurl,    
+          content:{    
+            classificationDef:strBridge,    
+            f:'json'    
+          },    
+          handleAs:'json',    
+          callbackParamName:'callback',    
+          timeout:15000    
+        }).then(lang.hitch(this,function(response){    
+          var uniqueValueInfosBridgeno = response && response.uniqueValueInfos;    
+          if(uniqueValueInfosBridgeno){    
+            var storeBridgeNo = new Memory({data:[]});    
+            dijit.byId("BridgeNoSelect").set('store',storeBridgeNo);    
+            var dataBridgeNo = array.map(uniqueValueInfosBridgeno,lang.hitch(this,function(info,index){    
+              var valueBridgeNo = info.value;    
+              //valueBridgeNo = parseFloat(valueBridgeNo);    
+              var dataItemBridgeNo = {    
+                id:index,    
+                name:valueBridgeNo    
+              };    
+              return dataItemBridgeNo;    
+            }));    
+            storeBridgeNo = new Memory({data:dataBridgeNo});    
+            dijit.byId("BridgeNoSelect").set('store',storeBridgeNo);    
+          }    
+        }),lang.hitch(this,function(error){    
+          console.error(error);    
+        }));  
         ////////////////////////////////////////////////////////////
 
         esriRequest({    
@@ -403,27 +448,39 @@
         }    
       };
 
- 
-      
-          
-          var bridgesUrl = "http://arcsvr.ahtd.com:6080/arcgis/rest/services/Bridge/FeatureServer/0";
+      selectorAppBridge = {    
+        valueselectBridge: function(elem){     
+          BridgesLyr.clearSelection();    
+          var query = new Query();
+          var where = "";
+          var tempElem;
 
-          BridgesLyr = new FeatureLayer(bridgesUrl, {
-            outFields: ["*"],
-            mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
-            visible: false,  
-            infoTemplate: infoTemplatecustom
-          });
-          map.addLayer(BridgesLyr);
+          tempElem = document.getElementById("BridgeNoSelect");
+          if(tempElem.value != "BridgeNo") {
+            where += (where !== "" ? " AND " : "") + "Struct_Num='" + tempElem.value.toString() + "'";
+          }
+         
+          query.where = where;
+
+          console.info(query.where);  
+          query.returnGeometry = true;    
+          BridgesLyr.selectFeatures(query, FeatureLayer.SELECTION_NEW, function (features) {    
+            //var thePoly = features[0].geometry;    
+            //var theExtent = thePoly.getExtent().expand(2); //Zoom out slightly from the polygon's extent     
+            //map.setExtent(theExtent);   
+          
+          });  
+          BridgesLyr.setDefinitionExpression(query.where);   
+        }    
+      };
+
 
           var layerList = new LayerList({
             map: map,
             showSubLayers: true,
-            layers: [JobStatusLyr, BridgesLyr]
+            layers: [{layer: JobStatusLyr, title: "Job Status"}, {layer: BridgesLyr, title: "Bridges"}] 
           },"layerList");
           layerList.startup();
-
-
 
           var myFeatureTable = new FeatureTable({
             featureLayer : JobStatusLyr,
