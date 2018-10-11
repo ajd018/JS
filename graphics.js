@@ -20,8 +20,7 @@
     "dojo/ready",
     "esri/map",    
     "dojo/on",    
-    "esri/tasks/query",  
-    "esri/tasks/FeatureSet",  
+    "esri/tasks/query",    
     "esri/layers/FeatureLayer",    
     "dojo/store/Memory",    
     "dojo/_base/array",    
@@ -41,7 +40,7 @@
     
   ], function(InfoTemplate, domUtils, SimpleMarkerSymbol, SimpleLineSymbol, 
   PictureMarkerSymbol, SimpleFillSymbol, Color,  Graphic, UniqueValueRenderer, 
-    FeatureTable, Search, LayerList, Print, registry, dom, parser, ready, Map, on, Query, FeatureSet, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
+    FeatureTable, Search, LayerList, Print, registry, dom, parser, ready, Map, on, Query, FeatureLayer, Memory, array, lang, esriRequest, Draw, json
 ) {
        
 
@@ -635,29 +634,31 @@
             map.infoWindow.selectNext();
           }
 
-            
-          
-
           var selectionToolbar;
 
+         
           map.on("load", initSelectToolbar);
-
-          var selectline = new SimpleLineSymbol();
-          selectline.setWidth(4);
-          selectline.setColor(new Color([0,255,255, 1]));
-          var selectlineSymbol = new SimpleFillSymbol();
-          selectlineSymbol.setOutline(selectline);
-          selectlineSymbol.setColor(new Color([46,191,240, 0]));
   
+          var fieldsSelectionSymbol =
+            new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+            new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
+  
+       
+  
+          //featureLayer.setDefinitionExpression("PROD_GAS='Yes'");
+          JobStatusLyr.setSelectionSymbol(fieldsSelectionSymbol);
+         
+     
           
-
+          //map.addLayer(JobStatusLyr);
+  
           on(dom.byId("selectFieldsButton"), "click", function () {
-            selectionToolbar.activate(Draw.POLYGON);
+            selectionToolbar.activate(Draw.EXTENT);
           });
   
           on(dom.byId("clearSelectionButton"), "click", function () {
             JobStatusLyr.clearSelection();
-            map.graphics.clear();
           });
   
           function initSelectToolbar (event) {
@@ -667,24 +668,12 @@
             on(selectionToolbar, "DrawEnd", function (geometry) {
               selectionToolbar.deactivate();
               selectQuery.geometry = geometry;
-
-              selectQuery.returnGeometry = true;   
-        
-
-              JobStatusLyr.queryFeatures(selectQuery, function (featureSet) {
-
-                array.forEach(featureSet.features, function (feature) {
-                   var Geom = feature.geometry; 
-                   var gra = new Graphic(Geom, selectlineSymbol); 
-                   map.graphics.add(gra); 
-                });
-                
-                });
-
-              JobStatusLyr.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW);   
-             
+              JobStatusLyr.selectFeatures(selectQuery,
+                FeatureLayer.SELECTION_NEW);
             });
           }
+          
+
 
        
      
